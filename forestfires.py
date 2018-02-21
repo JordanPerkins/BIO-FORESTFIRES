@@ -107,21 +107,21 @@ def initialise_fuel():
 
 def get_wind_effect(angle):
     if (angle >= 0 and angle <= 22.5) or angle>337.5:
-        return 1, 1, 1, 2, 2, 3, 3, 3
+        return 1, 1, 1, 1.5, 1.5, 2, 2, 2
     elif angle>22.5 and angle<=67.5:
-        return 2, 1, 1, 3, 1, 3, 3, 2
+        return 1.5, 1, 1, 2, 1, 2, 2, 1.5
     elif angle>67.5 and angle<=112.5:
-        return 3, 2, 1, 3, 1, 3, 2, 1
+        return 2, 1.5, 1, 2, 1, 2, 1.5, 1
     elif angle>112.5 and angle<=157.5:
-        return 3, 3, 2, 3, 1, 2, 1, 1
+        return 2, 2, 1.5, 2, 1, 1.5, 1, 1
     elif angle>157.5 and angle<=202.5:
-        return 3, 3, 3, 2, 2, 1, 1, 1
+        return 2, 2, 2, 1.5, 1.5, 1, 1, 1
     elif angle>202.5 and angle<=247.5:
-        return 2, 3, 3, 1, 3, 1, 1, 2
+        return 1.5, 2, 2, 1, 2, 1, 1, 1.5
     elif angle>247.5 and angle<=292.5:
-        return 1, 2, 3, 1, 3, 1, 2, 3
+        return 1, 1.5, 2, 1, 2, 1, 1.5, 2
     elif angle>292.5 and angle<=337.5:
-        return 1, 1, 2, 1, 3, 2, 3, 3
+        return 1, 1, 1.5, 1, 2, 1.5, 2, 2
 
 
 
