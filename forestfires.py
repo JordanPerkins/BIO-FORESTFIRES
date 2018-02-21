@@ -15,7 +15,6 @@ sys.path.append(main_dir_loc + 'capyle/guicomponents')
 from capyle.ca import Grid2D, Neighbourhood, CAConfig, randomise2d
 import capyle.utils as utils
 import numpy as np
-fuel_resources = np.zeros((500,500))
 
 INITIAL_CHAPARRAL_FUEL = 0.7
 INITIAL_LAKE_FUEL = 0
@@ -25,8 +24,7 @@ INITIAL_TOWN_FUEL = 0.9
 
 
 
-def transition_func(grid, neighbourstates, neighbourcounts):
-
+def transition_func(grid, neighbourstates, neighbourcounts, fuel_resources):
     return grid
 
 
@@ -49,8 +47,6 @@ def setup(args):
 
     # ----------------------------------------------------------------------
 
-    initialise_fuel(fuel_resources)
-
     if len(args) == 2:
         config.save()
         sys.exit()
@@ -62,8 +58,11 @@ def main():
     # Open the config object
     config = setup(sys.argv[1:])
 
+    # Create resource array
+    fuel_resources = initialise_fuel()
+
     # Create grid object
-    grid = Grid2D(config, transition_func)
+    grid = Grid2D(config, (transition_func, fuel_resources))
 
     # Run the CA, save grid state every generation to timeline
     timeline = grid.run()
@@ -86,20 +85,23 @@ def cell_resource(x,y):
     return 0
 
 
-def initialise_fuel(resource):
+def initialise_fuel():
+    resources = np.zeros((500, 500))
     for x in range(0, 500):
         for y in range(0, 500):
             cell_type = cell_resource(x,y)
             if cell_type == 0:
-                resource[x][y] = INITIAL_CHAPARRAL_FUEL
+                resources[x][y] = INITIAL_CHAPARRAL_FUEL
             elif cell_type == 1:
-                resource[x][y] = INITIAL_LAKE_FUEL
+                resources[x][y] = INITIAL_LAKE_FUEL
             elif cell_type == 2:
-                resource[x][y] = INITIAL_FOREST_FUEL
+                resources[x][y] = INITIAL_FOREST_FUEL
             elif cell_type == 3:
-                resource[x][y] = INITIAL_CANYON_FUEL
+                resources[x][y] = INITIAL_CANYON_FUEL
             elif cell_type == 4:
-                resource[x][y] = INITIAL_TOWN_FUEL
+                resources[x][y] = INITIAL_TOWN_FUEL
+    return resources
+
 
 if __name__ == "__main__":
     main()
