@@ -1,4 +1,4 @@
-# Name: Conway's game of life
+# Name: Forest fire's simulation
 # Dimensions: 2
 
 # --- Set up executable path, do not edit ---
