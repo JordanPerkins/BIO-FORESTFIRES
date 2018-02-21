@@ -22,6 +22,8 @@ INITIAL_FOREST_FUEL = 0.8
 INITIAL_CANYON_FUEL = 0.9
 INITIAL_TOWN_FUEL = 0.9
 
+WIND_DIRECTION = 0
+
 
 
 def transition_func(grid, neighbourstates, neighbourcounts, fuel_resources):
@@ -101,6 +103,30 @@ def initialise_fuel():
             elif cell_type == 4:
                 resources[x][y] = INITIAL_TOWN_FUEL
     return resources
+
+
+def get_wind_effect(angle):
+    if (angle >= 0 and angle <= 22.5) or angle>337.5:
+        return 1, 1, 1, 2, 2, 3, 3, 3
+    elif angle>22.5 and angle<=67.5:
+        return 2, 1, 1, 3, 1, 3, 3, 2
+    elif angle>67.5 and angle<=112.5:
+        return 3, 2, 1, 3, 1, 3, 2, 1
+    elif angle>112.5 and angle<=157.5:
+        return 3, 3, 2, 3, 1, 2, 1, 1
+    elif angle>157.5 and angle<=202.5:
+        return 3, 3, 3, 2, 2, 1, 1, 1
+    elif angle>202.5 and angle<=247.5:
+        return 2, 3, 3, 1, 3, 1, 1, 2
+    elif angle>247.5 and angle<=292.5:
+        return 1, 2, 3, 1, 3, 1, 2, 3
+    elif angle>292.5 and angle<=337.5:
+        return 1, 1, 2, 1, 3, 2, 3, 3
+
+
+
+
+
 
 
 if __name__ == "__main__":
