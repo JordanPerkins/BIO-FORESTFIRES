@@ -106,27 +106,37 @@ def initialise_fuel():
 
 
 def get_wind_effect(angle):
-    if (angle >= 0 and angle <= 22.5) or angle>337.5:
-        return 1, 1, 1, 1.5, 1.5, 2, 2, 2
+    if (angle >= 0 and angle <= 22.5):
+        weight = get_wind_adjustment(angle, 0)
+        return 1, 1, 1, 1.5-weight, 1.5-weight, 2-weight, 2-weight, 2-weight
     elif angle>22.5 and angle<=67.5:
-        return 1.5, 1, 1, 2, 1, 2, 2, 1.5
+        weight = get_wind_adjustment(angle, 45)
+        return 1.5-weight, 1, 1, 2-weight, 1, 2-weight, 2-weight, 1.5-weight
     elif angle>67.5 and angle<=112.5:
-        return 2, 1.5, 1, 2, 1, 2, 1.5, 1
+        weight = get_wind_adjustment(angle, 90)
+        return 2-weight, 1.5-weight, 1, 2-weight, 1, 2-weight, 1.5-weight, 1
     elif angle>112.5 and angle<=157.5:
-        return 2, 2, 1.5, 2, 1, 1.5, 1, 1
+        weight = get_wind_adjustment(angle, 135)
+        return 2-weight, 2-weight, 1.5-weight, 2-weight, 1, 1.5-weight, 1, 1
     elif angle>157.5 and angle<=202.5:
-        return 2, 2, 2, 1.5, 1.5, 1, 1, 1
+        weight = get_wind_adjustment(angle, 180)
+        return 2-weight, 2-weight, 2-weight, 1.5-weight, 1.5-weight, 1, 1, 1
     elif angle>202.5 and angle<=247.5:
-        return 1.5, 2, 2, 1, 2, 1, 1, 1.5
+        weight = get_wind_adjustment(angle, 225)
+        return 1.5-weight, 2-weight, 2-weight, 1, 2-weight, 1, 1, 1.5-weight
     elif angle>247.5 and angle<=292.5:
-        return 1, 1.5, 2, 1, 2, 1, 1.5, 2
+        weight = get_wind_adjustment(angle, 270)
+        return 1, 1.5-weight, 2-weight, 1, 2-weight, 1, 1.5-weight, 2-weight
     elif angle>292.5 and angle<=337.5:
-        return 1, 1, 1.5, 1, 2, 1.5, 2, 2
+        weight = get_wind_adjustment(angle, 315)
+        return 1, 1, 1.5-weight, 1, 2-weight, 1.5-weight, 2-weight, 2-weight
+    else:
+        weight = get_wind_adjustment(angle, 360)
+        return 1, 1, 1, 1.5-weight, 1.5-weight, 2-weight, 2-weight, 2-weight
 
 
-
-
-
+def get_wind_adjustment(angle, base_angle):
+    return round(abs((base_angle - angle) / 90), 2)
 
 
 if __name__ == "__main__":
