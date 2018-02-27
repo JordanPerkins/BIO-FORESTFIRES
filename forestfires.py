@@ -5,6 +5,7 @@
 import sys
 import inspect
 import math
+import random
 this_file_loc = (inspect.stack()[0][1])
 main_dir_loc = this_file_loc[:this_file_loc.index('ca_descriptions')]
 sys.path.append(main_dir_loc)
@@ -17,19 +18,47 @@ from capyle.ca import Grid2D, Neighbourhood, CAConfig, randomise2d
 import capyle.utils as utils
 import numpy as np
 
-INITIAL_CHAPARRAL_FUEL = 0.7
-INITIAL_LAKE_FUEL = 0
-INITIAL_FOREST_FUEL = 0.8
-INITIAL_CANYON_FUEL = 0.9
-INITIAL_TOWN_FUEL = 0.9
+INITIAL_CHAPARRAL_FUEL = 1800
+INITIAL_FOREST_FUEL = 3600
+INITIAL_CANYON_FUEL = 900
+
+CHAPARRAL_IGNITION = 0.075
+FOREST_IGNITION = 0.4
+SCRUBLAND_IGNITION = 0.5
+
 
 WIND_DIRECTION = "N"
 WIND_CONSTANT = 2
 
+PROBABILITY_CONSTANT = 0.58
 
 
 def transition_func(grid, neighbourstates, neighbourcounts, fuel_resources):
+    for x in range (0, 500):
+        for y in range (0,500):
+            if grid[x][y] == 1:
+                fuel_resources[x][y] = fuel_resources[x][y] - 16
+                if fuel_resources[x][y] <= 0:
+                    grid[x][y] = 2
+            elif grid[x][y] == 0:
+                if light_cell(x, y, neighbourstates):
+                    grid[x][y] = 1
+
     return grid
+
+
+def light_cell(x, y, neighbourstates):
+    ignition = cell_ignition(x, y)
+    wind = wind_effect(WIND_DIRECTION)
+    probability = random.random()
+    for cell in range (0,8):
+        if neighbourstates[cell][x][y] == 1:
+            prob = PROBABILITY_CONSTANT*(1+ignition)*wind[cell]
+            print(prob)
+            print(probability)
+            if prob >= probability:
+                return True
+    return False
 
 
 def setup(args):
@@ -45,9 +74,13 @@ def setup(args):
     # ---- Override the defaults below (these may be changed at anytime) ----
 
     config.state_colors = [(0,0.50,0),(1,0,0),(0,0,0)]
-    config.num_generations = 500
+    config.num_generations = 120
     config.grid_dims = (500,500)
-    config.initial_grid = np.zeros((500,500))
+    grid = np.zeros((500,500))
+    grid[1][1] = 1
+    grid[1][2] = 1
+    config.initial_grid = grid
+    config.wrap = False
 
     # ----------------------------------------------------------------------
 
@@ -97,17 +130,27 @@ def initialise_fuel():
             if cell_type == 0:
                 resources[x][y] = INITIAL_CHAPARRAL_FUEL
             elif cell_type == 1:
-                resources[x][y] = INITIAL_LAKE_FUEL
+                resources[x][y] = -1
             elif cell_type == 2:
                 resources[x][y] = INITIAL_FOREST_FUEL
             elif cell_type == 3:
                 resources[x][y] = INITIAL_CANYON_FUEL
             elif cell_type == 4:
-                resources[x][y] = INITIAL_TOWN_FUEL
+                resources[x][y] = -1
     return resources
 
+def cell_ignition(x,y):
+    cell_type = cell_resource(x,y)
+    if cell_type == 0:
+        return CHAPARRAL_IGNITION
+    elif cell_type == 2:
+        return FOREST_IGNITION
+    elif cell_type == 3:
+        return INITIAL_CANYON_FUEL
+    return 0
 
-def get_wind_effect(direction):
+
+def wind_effect(direction):
     dsin = round(WIND_CONSTANT*math.sin(45), 2)
     if direction == "N":
         return dsin, WIND_CONSTANT, dsin, 1, 1, 1, 1, 1
@@ -126,9 +169,6 @@ def get_wind_effect(direction):
     elif direction == "SE":
         return 1, 1, 1, 1, dsin, 1, dsin, WIND_CONSTANT
 
-
-def get_wind_adjustment(angle, base_angle):
-    return round(abs((base_angle - angle) / 90), 2)
 
 
 if __name__ == "__main__":
