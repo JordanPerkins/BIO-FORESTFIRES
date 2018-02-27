@@ -49,6 +49,8 @@ def transition_func(grid, neighbourstates, neighbourcounts, fuel_resources):
 
 def light_cell(x, y, neighbourstates):
     ignition = cell_ignition(x, y)
+    if ignition == 0:
+        return False
     wind = wind_effect(WIND_DIRECTION)
     probability = random.random()
     for cell in range (0,8):
