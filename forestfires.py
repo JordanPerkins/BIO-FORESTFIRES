@@ -55,7 +55,7 @@ def light_cell(x, y, neighbourstates):
     probability = random.random()
     for cell in range (0,8):
         if neighbourstates[cell][x][y] == 1:
-            prob = PROBABILITY_CONSTANT*(1+ignition)*wind[cell]
+            prob = PROBABILITY_CONSTANT*(1+ignition)*(wind[cell]/2)
             print(prob)
             print(probability)
             if prob >= probability:
