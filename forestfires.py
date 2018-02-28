@@ -26,9 +26,7 @@ CHAPARRAL_IGNITION = 0.075
 FOREST_IGNITION = -0.4
 SCRUBLAND_IGNITION = 0.5
 
-
 WIND_DIRECTION = "N"
-WIND_CONSTANT = 2
 
 PROBABILITY_CONSTANT = 0.58
 
@@ -52,10 +50,10 @@ def light_cell(x, y, neighbourstates):
     if ignition == 0:
         return False
     wind = wind_effect(WIND_DIRECTION)
-    probability = random.random()
+    probability = 0.43
     for cell in range (0,8):
         if neighbourstates[cell][x][y] == 1:
-            prob = PROBABILITY_CONSTANT*(1+ignition)*(wind[cell]/2)
+            prob = PROBABILITY_CONSTANT*(1+ignition)*wind[cell]
             print(prob)
             print(probability)
             if prob >= probability:
@@ -76,11 +74,11 @@ def setup(args):
     # ---- Override the defaults below (these may be changed at anytime) ----
 
     config.state_colors = [(0,0.50,0),(1,0,0),(0,0,0)]
-    config.num_generations = 500
+    config.num_generations = 50
     config.grid_dims = (500,500)
     grid = np.zeros((500,500))
-    grid[1][1] = 1
-    grid[1][2] = 1
+    grid[1][250] = 1
+    grid[1][251] = 1
     config.initial_grid = grid
     config.wrap = False
 
@@ -153,23 +151,23 @@ def cell_ignition(x,y):
 
 
 def wind_effect(direction):
-    dsin = round(WIND_CONSTANT*math.sin(45), 2)
+    dsin = round(math.sin(45), 2)
     if direction == "N":
-        return dsin, WIND_CONSTANT, dsin, 1, 1, 1, 1, 1
+        return dsin, 0.5, dsin, 0.5, 0.5, 0.5, 0.5, 0.5
     elif direction == "S":
-        return 1, 1, 1, 1, 1, dsin, WIND_CONSTANT, dsin
+        return 0.5, 0.5, 0.5, 0.5, 0.5, dsin, 1, dsin
     elif direction == "W":
-        return dsin, 1, 1, WIND_CONSTANT, 1, dsin, 1, 1
+        return dsin, 0.5, 0.5, 1, 0.5, dsin, 0.5, 0.5
     elif direction == "E":
-        return 1, 1, dsin, 1, WIND_CONSTANT, 1, 1, dsin
+        return 0.5, 0.5, dsin, 0.5, 1, 0.5, 0.5, dsin
     elif direction == "NW":
-        return WIND_CONSTANT, dsin, 1, dsin, 1, 1, 1, 1
+        return 1, dsin, 0.5, dsin, 0.5, 0.5, 0.5, 0.5
     elif direction == "NE":
-        return 1, dsin, WIND_CONSTANT, 1, dsin, 1, 1, 1
+        return 0.5, dsin, 1, 0.5, dsin, 0.5, 0.5, 0.5
     elif direction == "SW":
-        return 1, 1, 1, dsin, 1, WIND_CONSTANT, dsin, 1
+        return 0.5, 0.5, 0.5, dsin, 0.5, 1, dsin, 0.5
     elif direction == "SE":
-        return 1, 1, 1, 1, dsin, 1, dsin, WIND_CONSTANT
+        return 0.5, 0.5, 0.5, 0.5, dsin, 0.5, dsin, 1
 
 
 
