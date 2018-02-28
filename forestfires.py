@@ -50,7 +50,7 @@ def light_cell(x, y, neighbourstates):
     if ignition == 0:
         return False
     wind = wind_effect(WIND_DIRECTION)
-    probability = 0.43
+    probability = random.random()
     for cell in range (0,8):
         if neighbourstates[cell][x][y] == 1:
             prob = PROBABILITY_CONSTANT*(1+ignition)*wind[cell]
