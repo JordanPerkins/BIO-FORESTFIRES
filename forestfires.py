@@ -76,7 +76,7 @@ def setup(args):
     # ---- Override the defaults below (these may be changed at anytime) ----
 
     config.state_colors = [(0,0.50,0),(1,0,0),(0,0,0)]
-    config.num_generations = 120
+    config.num_generations = 500
     config.grid_dims = (500,500)
     grid = np.zeros((500,500))
     grid[1][1] = 1
