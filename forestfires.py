@@ -30,22 +30,39 @@ WIND_DIRECTION = "N"
 
 PROBABILITY_CONSTANT = 0.58
 
+WATER_DROP_GENERATION = 10
+WATER_DROP_COORDS = [[5,0],[5,1],[5,2],[5,3],[5,4],[5,5],[5,6]]
 
-def transition_func(grid, neighbourstates, neighbourcounts, fuel_resources):
+
+def transition_func(grid, neighbourstates, neighbourcounts, fuel_resources, water, generation):
     for x in range (0, 500):
         for y in range (0,500):
+            if WATER_DROP_GENERATION != -1:
+                if water[x][y] > 0:
+                    if neighbourcounts[1][x][y] == 0:
+                        water[x][y] = water[x][y] - 587
+                    elif neighbourcounts[1][x][y] < 4:
+                        water[x][y] = water[x][y] - 1176
+                    else:
+                        water[x][y] = water[x][y] - 2352
             if grid[x][y] == 1:
                 fuel_resources[x][y] = fuel_resources[x][y] - 16
                 if fuel_resources[x][y] <= 0:
                     grid[x][y] = 2
             elif grid[x][y] == 0:
-                if light_cell(x, y, neighbourstates):
+                if light_cell(x, y, neighbourstates, water[x][y]):
                     grid[x][y] = 1
+            if generation[0] == WATER_DROP_GENERATION:
+                putout = cell_putout(generation[0], x, y)
+                water[x][y] = 570000*putout[0]
+                if putout[1]:
+                    grid[x][y] = 0
 
+    generation[0] =+ 1
     return grid
 
 
-def light_cell(x, y, neighbourstates):
+def light_cell(x, y, neighbourstates, water):
     ignition = cell_ignition(x, y)
     if ignition == 0:
         return False
@@ -54,11 +71,48 @@ def light_cell(x, y, neighbourstates):
     for cell in range (0,8):
         if neighbourstates[cell][x][y] == 1:
             prob = PROBABILITY_CONSTANT*(1+ignition)*wind[cell]
+            if WATER_DROP_GENERATION != -1:
+                water_factor = 1-(water/570000)
+                prob = prob*water_factor
             print(prob)
             print(probability)
             if prob >= probability:
                 return True
     return False
+
+
+def cell_putout(generation, x, y):
+    time = (generation * 16) / 3600
+    rand = random.random()
+    type = cell_resource(x, y)
+    if type == 0:
+        if time < 1:
+            if 0.5 > rand:
+                return 0.5*rand, True
+            else:
+                return 0.5*rand, False
+        else:
+            if 0.3 > rand:
+                return 0.3*rand, True
+            else:
+                return 0.3*rand, False
+    elif type == 2:
+        if time < 2:
+            if 0.8 > rand:
+                return 0.8*rand, True
+            else:
+                return 0.8*rand, False
+        else:
+            if 0.4 > rand:
+                return 0.4*rand, True
+            else:
+                return 0.4*rand, False
+    elif type == 3:
+        if 0.3 > rand:
+            return 0.3*rand, True
+        else:
+            return 0.3*rand, False
+    return 0, False
 
 
 def setup(args):
@@ -74,11 +128,11 @@ def setup(args):
     # ---- Override the defaults below (these may be changed at anytime) ----
 
     config.state_colors = [(0,0.50,0),(1,0,0),(0,0,0)]
-    config.num_generations = 50
+    config.num_generations = 200
     config.grid_dims = (500,500)
     grid = np.zeros((500,500))
-    grid[1][250] = 1
-    grid[1][251] = 1
+    grid[1][1] = 1
+    grid[1][2] = 1
     config.initial_grid = grid
     config.wrap = False
 
@@ -98,8 +152,16 @@ def main():
     # Create resource array
     fuel_resources = initialise_fuel()
 
+    # Create water array
+    if WATER_DROP_GENERATION != -1:
+      water = initialise_water()
+    else:
+      water = None
+
+    generation = [0]
+
     # Create grid object
-    grid = Grid2D(config, (transition_func, fuel_resources))
+    grid = Grid2D(config, (transition_func, fuel_resources, water, generation))
 
     # Run the CA, save grid state every generation to timeline
     timeline = grid.run()
@@ -138,6 +200,16 @@ def initialise_fuel():
             elif cell_type == 4:
                 resources[x][y] = -1
     return resources
+
+
+def initialise_water():
+    water = np.zeros((500, 500))
+    for x in range(0, 500):
+        for y in range(0, 500):
+            if [x,y] in WATER_DROP_COORDS:
+                water[x][y] = 570000
+    return water
+
 
 def cell_ignition(x,y):
     cell_type = cell_resource(x,y)
