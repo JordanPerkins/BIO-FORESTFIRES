@@ -50,7 +50,7 @@ def transition_func(grid, neighbourstates, neighbourcounts, fuel_resources, wate
                 if fuel_resources[x][y] <= 0:
                     grid[x][y] = 2
             elif grid[x][y] == 0:
-                if light_cell(x, y, neighbourstates, water[x][y]):
+                if light_cell(x, y, neighbourstates, water):
                     grid[x][y] = 1
             if generation[0] == WATER_DROP_GENERATION:
                 putout = cell_putout(generation[0], x, y)
@@ -72,8 +72,10 @@ def light_cell(x, y, neighbourstates, water):
         if neighbourstates[cell][x][y] == 1:
             prob = PROBABILITY_CONSTANT*(1+ignition)*wind[cell]
             if WATER_DROP_GENERATION != -1:
-                water_factor = 1-(water/570000)
-                prob = prob*water_factor
+                water_factor = 1-(water[x][y]/570000)
+                water_neighbours = neighbour_waterstates(water, x, y)
+                damp_factor = 1-(water_neighbours[cell]/570000)
+                prob = prob*water_factor*damp_factor
             print(prob)
             print(probability)
             if prob >= probability:
@@ -113,6 +115,10 @@ def cell_putout(generation, x, y):
         else:
             return 0.3*rand, False
     return 0, False
+
+
+def neighbour_waterstates(water, x, y):
+    return water[x-1][y-1], water[x-1][y], water[x-1][y+1], water[x][y-1], water[x][y+1], water[x+1][y-1], water[x+1][y], water[x+1][y+1]
 
 
 def setup(args):
