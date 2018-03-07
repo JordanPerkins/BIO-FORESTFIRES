@@ -36,8 +36,8 @@ SCRUBLAND_IGNITION = 0.5
 
 PROBABILITY_CONSTANT = 0.58
 
-WATER_DROP_GENERATION = 10
-WATER_DROP_COORDS = [[5,0],[5,1],[5,2],[5,3],[5,4],[5,5],[5,6]]
+WATER_DROP_GENERATION = -1
+WATER_DROP_COORDS = []
 
 
 def transition_func(grid, neighbourstates, neighbourcounts, fuel_resources, water, generation):
@@ -76,8 +76,6 @@ def light_cell(x, y, neighbourstates, water, generation):
     probability = random.random()
     for cell in range (0,8):
         if neighbourstates[cell][x][y] == 1:
-            if ignition == -1:
-                print("Reached the town at generation " + str(generation))
             prob = PROBABILITY_CONSTANT*(1+ignition)*wind[cell]
             if WATER_DROP_GENERATION != -1:
                 water_factor = 1-(water[x][y]/570000)
@@ -236,8 +234,6 @@ def cell_ignition(x,y):
         return FOREST_IGNITION
     elif cell_type == 3:
         return INITIAL_CANYON_FUEL
-    elif cell_type == 4:
-        return -1
     return 0
 
 
