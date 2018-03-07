@@ -18,15 +18,21 @@ from capyle.ca import Grid2D, Neighbourhood, CAConfig, randomise2d
 import capyle.utils as utils
 import numpy as np
 
+
+# INCINERATOR OR PLANT
+STARTING_POSITION = "PLANT"
+# N, NE E, S, SE, W, SW, NW
+WIND_DIRECTION = "N"
+# NUMBER OF GENERATIONS. 1 GEN = 16 seconds
+NUM_GENERATIONS = 500
+
 INITIAL_CHAPARRAL_FUEL = 1800
 INITIAL_FOREST_FUEL = 3600
 INITIAL_CANYON_FUEL = 900
 
 CHAPARRAL_IGNITION = 0.075
-FOREST_IGNITION = -0.4
+FOREST_IGNITION = -0.45
 SCRUBLAND_IGNITION = 0.5
-
-WIND_DIRECTION = "N"
 
 PROBABILITY_CONSTANT = 0.58
 
@@ -50,7 +56,7 @@ def transition_func(grid, neighbourstates, neighbourcounts, fuel_resources, wate
                 if fuel_resources[x][y] <= 0:
                     grid[x][y] = 2
             elif grid[x][y] == 0:
-                if light_cell(x, y, neighbourstates, water):
+                if light_cell(x, y, neighbourstates, water, generation[0]):
                     grid[x][y] = 1
             if generation[0] == WATER_DROP_GENERATION:
                 putout = cell_putout(generation[0], x, y)
@@ -62,7 +68,7 @@ def transition_func(grid, neighbourstates, neighbourcounts, fuel_resources, wate
     return grid
 
 
-def light_cell(x, y, neighbourstates, water):
+def light_cell(x, y, neighbourstates, water, generation):
     ignition = cell_ignition(x, y)
     if ignition == 0:
         return False
@@ -70,14 +76,14 @@ def light_cell(x, y, neighbourstates, water):
     probability = random.random()
     for cell in range (0,8):
         if neighbourstates[cell][x][y] == 1:
+            if ignition == -1:
+                print("Reached the town at generation " + str(generation))
             prob = PROBABILITY_CONSTANT*(1+ignition)*wind[cell]
             if WATER_DROP_GENERATION != -1:
                 water_factor = 1-(water[x][y]/570000)
                 water_neighbours = neighbour_waterstates(water, x, y)
                 damp_factor = 1-(water_neighbours[cell]/570000)
                 prob = prob*water_factor*damp_factor
-            print(prob)
-            print(probability)
             if prob >= probability:
                 return True
     return False
@@ -134,11 +140,16 @@ def setup(args):
     # ---- Override the defaults below (these may be changed at anytime) ----
 
     config.state_colors = [(0,0.50,0),(1,0,0),(0,0,0)]
-    config.num_generations = 200
+    config.num_generations = NUM_GENERATIONS
     config.grid_dims = (500,500)
     grid = np.zeros((500,500))
-    grid[1][1] = 1
-    grid[1][2] = 1
+
+    # Set starting position
+    if STARTING_POSITION == "INCINERATOR":
+      grid[0][499] = 1
+    elif STARTING_POSITION == "PLANT":
+      grid[0][0] = 1
+
     config.initial_grid = grid
     config.wrap = False
 
@@ -225,6 +236,8 @@ def cell_ignition(x,y):
         return FOREST_IGNITION
     elif cell_type == 3:
         return INITIAL_CANYON_FUEL
+    elif cell_type == 4:
+        return -1
     return 0
 
 
