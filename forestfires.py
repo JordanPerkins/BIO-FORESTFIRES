@@ -79,8 +79,8 @@ def light_cell(x, y, neighbourstates, water, generation):
             prob = PROBABILITY_CONSTANT*(1+ignition)*wind[cell]
             if WATER_DROP_GENERATION != -1:
                 water_factor = 1-(water[x][y]/570000)
-                water_neighbours = neighbour_waterstates(water, x, y)
-                damp_factor = 1-(water_neighbours[cell]/570000)
+                water_neighbours = neighbour_waterstates(cell, water, x, y)
+                damp_factor = 1-(water_neighbours/570000)
                 prob = prob*water_factor*damp_factor
             if prob >= probability:
                 return True
@@ -121,8 +121,23 @@ def cell_putout(generation, x, y):
     return 0, False
 
 
-def neighbour_waterstates(water, x, y):
-    return water[x-1][y-1], water[x-1][y], water[x-1][y+1], water[x][y-1], water[x][y+1], water[x+1][y-1], water[x+1][y], water[x+1][y+1]
+def neighbour_waterstates(cell, water, x, y):
+    if cell == 0:
+        return water[x-1][y-1]
+    elif cell == 1:
+        return water[x-1][y]
+    elif cell == 2:
+        return water[x - 1][y + 1]
+    elif cell == 3:
+        return water[x][y-1]
+    elif cell == 4:
+        return water[x][y+1]
+    elif cell == 5:
+        return water[x+1][y-1]
+    elif cell == 6:
+        return water[x + 1][y]
+    elif cell == 7:
+        return water[x + 1][y + 1]
 
 
 def setup(args):
